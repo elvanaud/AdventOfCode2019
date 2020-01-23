@@ -1,6 +1,6 @@
 import random
 
-zone_size = 20
+zone_size = 70
 beta = 2
 start_nb = 80
 nb_iter = 20
@@ -40,25 +40,30 @@ def generation():
         zone_tmp[y][x] = LIVING_CELL
   zone = zone_tmp
 
-"""
-def print_zone():
-  [print("".join(line)) for line in zone]
-  print("-------------------")
-print_zone()
-for _ in range(nb_iter):
-  generation()
-  print_zone()
-"""
-
 import sys
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.QtWidgets import *
 
+CELL_SIZE = 10
+
+class MyGraphicScene(QGraphicsScene):
+  def __init__(self):
+    QGraphicsScene.__init__(self)
+  def mousePressEvent(self,event : QGraphicsSceneMouseEvent):
+    x,y=event.scenePos().x(),event.scenePos().y()
+    cell_x,cell_y = int(x/CELL_SIZE),int(y/CELL_SIZE)
+    if zone[cell_y][cell_x] == EMPTY_CELL:
+      zone[cell_y][cell_x] = LIVING_CELL
+    else:
+      zone[cell_y][cell_x] = EMPTY_CELL
+    drawZone()
+
 def drawZone():
   scene.clear()
+  
   for y in range(zone_size):
       for x in range(zone_size):
-        r = QGraphicsRectItem(x*10,y*10,10,10)
+        r = QGraphicsRectItem(x*CELL_SIZE,y*CELL_SIZE,CELL_SIZE,CELL_SIZE)
         colors = {EMPTY_CELL: Qt.white, LIVING_CELL: Qt.black}
         r.setBrush(colors[zone[y][x]])
         scene.addItem(r)
@@ -86,7 +91,7 @@ def update_beta(b):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = QWidget()
-    scene = QGraphicsScene()
+    scene = MyGraphicScene()
     view = QGraphicsView(scene)
     w.setWindowTitle('Game Of Life')
     drawZone()
